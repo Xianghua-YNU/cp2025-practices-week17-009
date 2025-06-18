@@ -28,7 +28,7 @@ def solve_ode(h, g, max_iter=10000, tol=1e-6):
     2. 应用松弛迭代公式直到收敛
     3. 返回时间和解数组
     """
-    # 初始化时间数组
+    # 初始化时间数组 [0, 10] 区间，步长为 h
     t = np.arange(0, 10 + h, h)
     
     # 初始化解数组，边界条件已满足：x[0] = x[-1] = 0
@@ -42,25 +42,29 @@ def solve_ode(h, g, max_iter=10000, tol=1e-6):
     # 4. 计算最大变化量：delta = np.max(np.abs(x_new - x))
     # 5. 更新解：x = x_new
     
-    # Initialize time array
+    # 初始化时间数组 [0, 10] 区间，步长为 h
     t = np.arange(0, 10 + h, h)
     
-    # Initialize solution array
+    # 初始化解数组，初始值为全零（满足边界条件）
     x = np.zeros(t.size)
     
-    # Apply relaxation iteration
-    delta = 1.0
-    iteration = 0
+    # 初始化收敛判断变量和迭代计数器
+    delta = 1.0        # 记录每次迭代的最大变化量
+    iteration = 0      # 当前迭代次数
     
-    while delta > tol and iteration < max_iter:
+    while delta > tol and iteration < max_iter:    # 未达到收敛且未超过最大迭代次数时继续
         x_new = np.copy(x)
         
+        # 核心松弛法更新公式：
+        # 使用中心差分法离散二阶导数 d²x/dt² ≈ (x[i+1] - 2x[i] + x[i-1])/h²
+        # 代入方程 (x[i+1] - 2x[i] + x[i-1])/h² = -g
+        # 整理得：x[i] = (h²g + x[i+1] + x[i-1])/2
         x_new[1:-1] = 0.5 * (h * h * g + x[2:] + x[:-2])
         
-        # Calculate maximum change
+        # 计算当前迭代的最大变化量（无穷范数）
         delta = np.max(np.abs(x_new - x))
         
-        # Update solution
+        # 更新解为当前迭代结果
         x = x_new
         iteration += 1
     
