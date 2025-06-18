@@ -42,7 +42,29 @@ def solve_ode(h, g, max_iter=10000, tol=1e-6):
     # 4. 计算最大变化量：delta = np.max(np.abs(x_new - x))
     # 5. 更新解：x = x_new
     
-    raise NotImplementedError(f"请在 {__file__} 中实现此函数")
+    # Initialize time array
+    t = np.arange(0, 10 + h, h)
+    
+    # Initialize solution array
+    x = np.zeros(t.size)
+    
+    # Apply relaxation iteration
+    delta = 1.0
+    iteration = 0
+    
+    while delta > tol and iteration < max_iter:
+        x_new = np.copy(x)
+        
+        x_new[1:-1] = 0.5 * (h * h * g + x[2:] + x[:-2])
+        
+        # Calculate maximum change
+        delta = np.max(np.abs(x_new - x))
+        
+        # Update solution
+        x = x_new
+        iteration += 1
+    
+    return t, x
 
 if __name__ == "__main__":
     # 测试参数
